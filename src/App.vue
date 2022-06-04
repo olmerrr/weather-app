@@ -6,16 +6,19 @@
           <input
             type="text"
             class="search-bar"
-            placeholder="Search City"
+            placeholder="Just write the city"
             autofocus
-            v-model="query"
-            @keypress="fetchWeather"
+            v-model.trim="query"
+            @keypress="handleEnter"
           />
 
-          <!-- <button @click="fetchWeather">Search</button> -->
+          <button
+            class="btn" 
+            @click="fetchWeather">Search
+          </button>
         </div>
 
-        <div
+        <section
           class="weather-wrap"
           v-if="typeof weather.condition !== 'undefined'"
         >
@@ -27,14 +30,19 @@
           </div>
 
           <div class="weather-box">
-            <div class="temp">
-              {{ weather.feelslike_c }}
-            </div>
+            <h2 class="weather-box title">Temperatura</h2>
+            <div class="temp">{{ weather.temp_c }} &#8451;</div>
+            <h2 class="weather-box title">Temperatura Feels Like</h2>
+            <div class="temp">{{ weather.feelslike_c }} &#8451;</div>
 
-         
-            <div class="weather">{{ weather.condition }}
+            <div class="weather">{{ weather.condition['text'] }}</div>
+            <img 
+              class="weather-img"
+              :src="weather.condition['icon']"
+              alt="weather-img"
+            />
           </div>
-        </div>
+        </section>
       </div>
     </main>
   </div>
@@ -54,13 +62,14 @@
       };
     },
     methods: {
-      async fetchWeather(e) {
-        if (e.key == 'Enter') {
+      async fetchWeather() {
+        if (this.query && this.query.length >= 3) {
           try {
             this.weather = {};
             const response = await fetch(
               `${this.url_base}?key=${this.api_key}&q=${this.query}`
             );
+
             const data = await response.json();
             this.setResults(data);
             return data;
@@ -69,11 +78,20 @@
           }
         }
       },
+      handleEnter(e) {
+        if (this.query && e.key == 'Enter' ) {
+          this.fetchWeather()
+        }
+      },
       setResults(results) {
         this.weather = results.current;
         this.location = results.location;
       },
     },
+    created() {
+      this.query = 'Kiev'
+      this.fetchWeather()
+    }
   };
 </script>
 
@@ -95,7 +113,7 @@
   }
   .main {
     min-height: 100vh;
-    padding: 25px;
+    padding: 10px;
     background-image: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.25),
@@ -107,14 +125,18 @@
     margin: 0 auto;
   }
   .search-box {
-    width: 100%;
-    margin-bottom: 32px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
   }
 
   .search-box .search-bar {
+    padding-left: 6px;
     display: block;
     width: 100%;
-    padding: 15px;
+    height: 42px;
+    margin-right: 40px;
     color: #333;
     font-size: 18px;
     appearance: none;
@@ -126,16 +148,31 @@
     border-radius: 0 16px 0 16px;
     transition: 0.4s;
   }
+  .search-box .search-bar::placeholder{
+    padding-left: 6px;
+  }
 
   .search-box .search-bar:focus {
+    padding-left: 6px;
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
     background-color: rgba(255, 255, 255, 0.72);
     border-radius: 16px 0 16px 0;
+   
   }
 
-  .weather-wrap {
+ 
+  .search-box .btn {
+    width: 120px;
+    height: 42px;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 6px;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
   }
   .location {
+    margin-bottom: 20px;
     color: #fff;
     font-size: 32px;
     font-weight: 500;
@@ -151,21 +188,23 @@
     font-style: italic;
   }
   .weather-box {
+    margin-top: 20px;
     text-align: center;
   }
-  .weather-box .legend {
-    font-size: 18px;
+  .weather-box .title {
+    font-size: 24px;
+     color: #fff;
   }
   .temp {
     color: #fff;
-    font-size: 102px;
+    font-size: 88px;
     font-weight: 900;
     display: inline-block;
-    padding: 10px 25px;
+    padding: 10px;
     text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
     background-color: rgba(255, 255, 255, 0.25);
     border-radius: 16px;
-    margin: 30px 0;
+    margin: 15px 0;
     box-shadow: 3px 6px rgba(0, 0, 0, 0.25);
   }
   .weather {
