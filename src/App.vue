@@ -54,7 +54,7 @@
     components: {},
     data() {
       return {
-        url_base: 'http://api.weatherapi.com/v1/current.json',
+        url_base: 'https://api.weatherapi.com/v1/current.json',
         api_key: 'ccff10f7cbfd4d1b815130739220306',
         query: '',
         weather: {},
